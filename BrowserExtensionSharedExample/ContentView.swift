@@ -6,14 +6,28 @@
 //
 
 import SwiftUI
+import EngineCommon
 
 struct ContentView: View {
+    @State var result = "Content Not Started..."
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text(result)
+            Button(action: {
+                Task { @MainActor in
+                    do {
+                        let key = "hello"
+                        let local = try getValueLocal(key: key)
+                        let remote = try await startAndQueryContent(key: key)
+                        result = "Key: \(key)\nLocal Value: \(local)\nRemote Value: \(remote)"
+                    } catch {
+                        result = "ERRORED"
+                    }
+                }
+            }) {
+                Text("Start Content Process")
+            }
         }
         .padding()
     }
